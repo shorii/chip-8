@@ -21,6 +21,7 @@ mod opcode_0x8xy7;
 mod opcode_0x8xye;
 mod opcode_0xannn;
 mod opcode_0xbnnn;
+mod opcode_0xcxkk;
 
 pub trait Instruction {
     fn execute(&self, memory: &mut Memory, register: &mut Register, graphic: &mut Graphic);
@@ -63,6 +64,7 @@ impl From<[u8; 2]> for Box<dyn Instruction> {
             },
             0xa => Box::new(opcode_0xannn::Opcode0xannn::new(instruction)),
             0xb => Box::new(opcode_0xbnnn::Opcode0xbnnn::new(instruction)),
+            0xc => Box::new(opcode_0xcxkk::Opcode0xcxkk::new(instruction)),
             _ => panic!("unsupported operator"),
         }
     }
