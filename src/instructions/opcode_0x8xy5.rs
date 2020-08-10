@@ -54,7 +54,7 @@ mod test {
 
     #[test]
     fn test_execute_if_borrowing() {
-        let instruction: u16 = 0x8124;
+        let instruction: u16 = 0x8125;
         let opcode = Opcode0x8xy5::new(instruction);
         let mut memory = Memory::new();
         let mut register = Register::new();
