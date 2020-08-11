@@ -19,9 +19,9 @@ impl Instruction for Opcode0x8xye {
     fn execute(&self, _memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
         let most_significant_bit = ((register.v[self.vx] & 0x80) >> 7) as u8;
         if most_significant_bit == 1 {
-            register.v[15] = 1;
+            register.v[0xF] = 1;
         } else {
-            register.v[15] = 0;
+            register.v[0xF] = 0;
         }
         register.v[self.vx] <<= 1;
         register.pc = match register.pc.checked_add(2) {

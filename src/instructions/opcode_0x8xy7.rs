@@ -22,9 +22,9 @@ impl Instruction for Opcode0x8xy7 {
         let (result, borrowing) = register.v[self.vy].overflowing_sub(register.v[self.vx]);
         register.v[self.vx] = result;
         if borrowing {
-            register.v[15] = 0;
+            register.v[0xF] = 0;
         } else {
-            register.v[15] = 1;
+            register.v[0xF] = 1;
         }
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,

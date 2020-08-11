@@ -23,9 +23,9 @@ impl Instruction for Opcode0x8xy4 {
         let (result, overflowing) = register.v[self.vx].overflowing_add(register.v[self.vy]);
         register.v[self.vx] = result;
         if overflowing {
-            register.v[15] = 1;
+            register.v[0xF] = 1;
         } else {
-            register.v[15] = 0;
+            register.v[0xF] = 0;
         }
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,

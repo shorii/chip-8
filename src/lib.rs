@@ -50,6 +50,28 @@ pub mod emulator {
         pub fn clear(&mut self) {
             self.gfx = [0; 2048];
         }
+        pub fn set_sprite(&mut self, x: usize, y: usize, sprite: &[u8]) -> bool {
+            assert!(x > 64);
+            assert!(y > 32);
+            let mut collision = false;
+            for (yi, sprite_fragment) in sprite.iter().enumerate() {
+                for xi in 0..8 {
+                    let pixel = (sprite_fragment & (0x80 >> xi)) as u8;
+                    let index = y.checked_mul(64).unwrap()
+                                 .checked_add(yi).unwrap()
+                                 .checked_add(x).unwrap()
+                                 .checked_add(xi).unwrap();
+                    if pixel == 1 {
+                        let screen_pixel = (self.gfx[index] & (0x80 >> xi)) as u8;
+                        if screen_pixel == 1 {
+                            collision = true;
+                        }
+                        self.gfx[index] ^= pixel;
+                    }
+                }
+            }
+            collision
+        }
     }
 
     use super::instructions::Instruction;
