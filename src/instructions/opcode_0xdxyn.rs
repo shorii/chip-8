@@ -98,4 +98,44 @@ mod test {
         assert_eq!(register.v[0xF], 0);
         assert_eq!(register.pc, 2);
     }
+
+    #[test]
+    fn test_execute_collision() {
+        let instruction = 0xd123;
+        let opcode = Opcode0xdxyn::new(instruction);
+
+        let mut memory = Memory::new();
+        memory.all[0x12] = 0xF0; // 0b11110000
+
+        let (x, y): (usize, usize) = (0, 0);
+
+        let mut register = Register::new();
+        register.i = 0x12;
+        register.v[0x1] = x as u8;
+        register.v[0x2] = y as u8;
+
+        let mut graphic = Graphic::new();
+        graphic.gfx[0] = 1;
+        graphic.gfx[1] = 0;
+        graphic.gfx[2] = 0;
+        graphic.gfx[3] = 0;
+        graphic.gfx[4] = 1;
+        graphic.gfx[5] = 0;
+        graphic.gfx[6] = 0;
+        graphic.gfx[7] = 0;
+
+        opcode.execute(&mut memory, &mut register, &mut graphic);
+
+        assert_eq!(graphic.gfx[0], 0);
+        assert_eq!(graphic.gfx[1], 1);
+        assert_eq!(graphic.gfx[2], 1);
+        assert_eq!(graphic.gfx[3], 1);
+        assert_eq!(graphic.gfx[4], 1);
+        assert_eq!(graphic.gfx[5], 0);
+        assert_eq!(graphic.gfx[6], 0);
+        assert_eq!(graphic.gfx[7], 0);
+
+        assert_eq!(register.v[0xF], 1);
+        assert_eq!(register.pc, 2);
+    }
 }
