@@ -1,6 +1,9 @@
 mod instructions;
 
 pub mod emulator {
+    use std::convert::TryFrom;
+    use super::instructions::Instruction;
+
     // 0x000 - 0x1FF reserved by interpreter
     // 0xEA0 - 0xEFF reserved for call stack (16 layer)
     // 0xF00 - 0xFFF reserved for display refresh
@@ -16,6 +19,12 @@ pub mod emulator {
                 all: [0; 4096],
                 stack: [0; 16],
             }
+        }
+
+        pub fn read(&self, program_counter: u16) -> [u8; 2] {
+            let s = program_counter as usize;
+            let e = s + 2;
+            <[u8; 2]>::try_from(&self.all[s..e]).unwrap()
         }
     }
 
@@ -34,8 +43,7 @@ pub mod emulator {
                 sp: 0,
                 i: 0,
                 v: [0; 16],
-            }
-        }
+            } }
     }
 
     pub struct Graphic {
@@ -74,7 +82,6 @@ pub mod emulator {
         }
     }
 
-    use super::instructions::Instruction;
     pub struct Cpu {
         memory: Memory,
         register: Register,
@@ -88,9 +95,9 @@ pub mod emulator {
 
         pub fn execute(&mut self) {
             //// fetch using pc?
-            //let opcode = self.memory.read(self.register.pc, 2);
+            let opcode = self.memory.read(self.register.pc);
             //// recog instruction
-            let instruction = Box::<dyn Instruction>::from([1, 2]);
+            let instruction = Box::<dyn Instruction>::from(opcode);
             //// execute
             instruction.execute(&mut self.memory, &mut self.register, &mut self.graphic);
         }
