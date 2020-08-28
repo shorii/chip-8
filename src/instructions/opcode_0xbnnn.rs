@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Jump to location nnn + V0.
 /// The program counter is set to nnn plus the value of V0.
@@ -15,7 +16,13 @@ impl Opcode0xbnnn {
 }
 
 impl Instruction for Opcode0xbnnn {
-    fn execute(&self, _memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        _memory: &mut Memory,
+        register: &mut Register,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mut mpsc::Receiver<u8>,
+    ) {
         let address = match self.address.checked_add(register.v[0] as u16) {
             Some(value) => value,
             None => panic!("invalid address access")

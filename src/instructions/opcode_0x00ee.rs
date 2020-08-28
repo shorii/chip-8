@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Return from a subroutine.
 /// The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack.
@@ -12,7 +13,13 @@ impl Opcode0x00ee {
 }
 
 impl Instruction for Opcode0x00ee {
-    fn execute(&self, memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        memory: &mut Memory,
+        register: &mut Register,
+        _graphic: &mut Graphic,
+        keyboard_bus: &mut mpsc::Receiver<u8>,
+    ) {
         let return_address = memory.stack[register.sp as usize];
         register.sp = match register.sp.checked_sub(1) {
             Some(value) => value,

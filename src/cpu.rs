@@ -3,6 +3,7 @@ use super::memory::Memory;
 use super::graphic::Graphic;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::mpsc;
 
 pub struct Register {
     pub pc: u16,
@@ -26,12 +27,19 @@ pub struct Cpu {
     memory: Memory,
     register: Register,
     graphic: Graphic,
+    keyboard_bus: mpsc::Receiver<u8>,
     terminated: Arc<AtomicBool>,
 }
 
 impl Cpu {
-    pub fn new(memory: Memory, register: Register, graphic: Graphic, terminated: Arc<AtomicBool>) -> Self {
-        Cpu {memory, register, graphic, terminated}
+    pub fn new(
+        memory: Memory,
+        register: Register,
+        graphic: Graphic,
+        keyboard_bus: mpsc::Receiver<u8>,
+        terminated: Arc<AtomicBool>
+    ) -> Self {
+        Cpu {memory, register, graphic, keyboard_bus, terminated}
     }
 
     pub fn execute(&mut self) {
@@ -41,7 +49,12 @@ impl Cpu {
             // recog instruction
             let instruction = Box::<dyn Instruction>::from(opcode);
             // execute
-            instruction.execute(&mut self.memory, &mut self.register, &mut self.graphic);
+            instruction.execute(
+                &mut self.memory,
+                &mut self.register,
+                &mut self.graphic,
+                &mut self.keyboard_bus,
+            );
             // draw
             self.graphic.draw();
         }

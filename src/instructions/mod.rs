@@ -1,4 +1,5 @@
 use super::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 mod opcode_0x0nnn;
 mod opcode_0x00e0;
@@ -25,7 +26,13 @@ mod opcode_0xcxkk;
 mod opcode_0xdxyn;
 
 pub trait Instruction {
-    fn execute(&self, memory: &mut Memory, register: &mut Register, graphic: &mut Graphic);
+    fn execute(
+        &self,
+        memory: &mut Memory,
+        register: &mut Register,
+        graphic: &mut Graphic,
+        keyboard_bus: &mut mpsc::Receiver<u8>,
+    );
 }
  
 impl From<[u8; 2]> for Box<dyn Instruction> {

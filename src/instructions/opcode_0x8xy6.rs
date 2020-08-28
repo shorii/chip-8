@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Set Vx = Vx SHR 1.
 /// If the least-significant bit of Vx is 1, the VF is set to 1, otherwise 0.
@@ -16,7 +17,13 @@ impl Opcode0x8xy6 {
 }
 
 impl Instruction for Opcode0x8xy6 {
-    fn execute(&self, _memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        _memory: &mut Memory,
+        register: &mut Register,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mut mpsc::Receiver<u8>,
+    ) {
         let least_significant_bit = (register.v[self.vx] & 0x0001) as u8;
         if least_significant_bit == 1 {
             register.v[0xF] = 1;

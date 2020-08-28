@@ -62,14 +62,22 @@ fn main() {
 
     let (key_event_sender, key_event_receiver) = mpsc::channel();
     let key_event_sender = Arc::new(Mutex::new(key_event_sender));
-    let key_event_receiver = Arc::new(Mutex::new(key_event_receiver));
     let keypad = Keypad::new(key_event_sender);
 
     let memory = Memory::new();
     let register = Register::new();
-    let mut emulator = Cpu::new(memory, register, graphic, Arc::clone(&terminated));
-
-    let mut console = Console::new(graphic_receiver, Box::new(keypad), Arc::clone(&terminated)).unwrap();
+    let mut emulator = Cpu::new(
+        memory,
+        register,
+        graphic,
+        key_event_receiver,
+        Arc::clone(&terminated)
+    );
+    let mut console = Console::new(
+        graphic_receiver,
+        Box::new(keypad),
+        Arc::clone(&terminated)
+    ).unwrap();
     console.run();
     emulator.execute();
     console.join();

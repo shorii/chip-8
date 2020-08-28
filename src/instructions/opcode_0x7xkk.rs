@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// ADD Vx = Vx + kk.
 /// Adds the value kk to the value of register Vx, the stores the result in Vx.
@@ -17,7 +18,13 @@ impl Opcode0x7xkk {
 }
 
 impl Instruction for Opcode0x7xkk {
-    fn execute(&self, _memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        _memory: &mut Memory,
+        register: &mut Register,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mut mpsc::Receiver<u8>,
+    ) {
         register.v[self.vx] = register.v[self.vx].wrapping_add(self.byte);
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,

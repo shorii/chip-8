@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Call subroutine at nnn.
 /// The interpreter increments the stack pointer, then puts the current PC on the top of the stack.
@@ -16,7 +17,13 @@ impl Opcode0x2nnn {
 }
 
 impl Instruction for Opcode0x2nnn {
-    fn execute(&self, memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        memory: &mut Memory,
+        register: &mut Register,
+        _graphic: &mut Graphic,
+        keyboard_bus: &mut mpsc::Receiver<u8>
+    ) {
         memory.stack[register.sp as usize] = register.pc;
         register.sp = match register.sp.checked_add(1) {
             Some(value) => value,

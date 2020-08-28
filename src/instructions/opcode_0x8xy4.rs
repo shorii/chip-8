@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Set Vx = Vx + Vy, set VF = carry.
 /// The values of Vx and Vy are added together.
@@ -19,7 +20,13 @@ impl Opcode0x8xy4 {
 }
 
 impl Instruction for Opcode0x8xy4 {
-    fn execute(&self, _memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        _memory: &mut Memory,
+        register: &mut Register,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mut mpsc::Receiver<u8>,
+    ) {
         let (result, overflowing) = register.v[self.vx].overflowing_add(register.v[self.vy]);
         register.v[self.vx] = result;
         if overflowing {

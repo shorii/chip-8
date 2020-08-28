@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
 /// The interpreter reads n bytes from memory, starting at the address stored in I.
@@ -24,7 +25,13 @@ impl Opcode0xdxyn {
 }
 
 impl Instruction for Opcode0xdxyn {
-    fn execute(&self, memory: &mut Memory, register: &mut Register, graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        memory: &mut Memory,
+        register: &mut Register,
+        graphic: &mut Graphic,
+        keyboard_bus: &mut mpsc::Receiver<u8>,
+    ) {
         let start = register.i as usize;
         let end = register.i as usize + self.nibble as usize;
         let sprite = &memory.all[start..end];

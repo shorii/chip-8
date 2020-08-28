@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Skip next instruction if Vx = Vy.
 /// The interpreter compares register Vx to Vy, and if they are equal, increments the pragram
@@ -18,7 +19,13 @@ impl Opcode0x5xy0 {
 }
 
 impl Instruction for Opcode0x5xy0 {
-    fn execute(&self, _memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        _memory: &mut Memory,
+        register: &mut Register,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mut mpsc::Receiver<u8>,
+    ) {
         let mut increment = 0;
         if register.v[self.vx] == register.v[self.vy] {
             increment += 2;

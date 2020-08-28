@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Set Vx = kk.
 /// The interpreter puts the value kk into register Vx.
@@ -17,7 +18,13 @@ impl Opcode0x6xkk {
 }
 
 impl Instruction for Opcode0x6xkk {
-    fn execute(&self, _memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        _memory: &mut Memory,
+        register: &mut Register,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mut mpsc::Receiver<u8>,
+    ) {
         register.v[self.vx] = self.byte;
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,

@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Jump to location nnn.
 pub struct Opcode0x1nnn {
@@ -14,7 +15,13 @@ impl Opcode0x1nnn {
 }
 
 impl Instruction for Opcode0x1nnn {
-    fn execute(&self, _memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        _memory: &mut Memory,
+        register: &mut Register,
+        _graphic: &mut Graphic,
+        keyboard: &mut mpsc::Receiver<u8>
+    ) {
         register.pc = self.address;
     }
 }
