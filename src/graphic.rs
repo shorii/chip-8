@@ -1,11 +1,15 @@
+use console::Graphic as ConsoleGraphic;
+use std::sync::mpsc;
+
 pub struct Graphic {
     pub gfx: [u8; 2048],
+    pub sender: mpsc::Sender<ConsoleGraphic>,
 }
 
 // XXX depricated
 impl Graphic {
-    pub fn new() -> Self {
-        Graphic { gfx: [0; 2048] }
+    pub fn new(sender: mpsc::Sender<ConsoleGraphic>) -> Self {
+        Graphic { gfx: [0; 2048], sender }
     }
     pub fn clear(&mut self) {
         self.gfx = [0; 2048];
@@ -31,5 +35,10 @@ impl Graphic {
             }
         }
         collision
+    }
+
+    pub fn draw(&self) {
+        let gfx = self.gfx.to_vec();
+        self.sender.send(ConsoleGraphic::new(gfx, 64));
     }
 }
