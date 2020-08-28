@@ -25,7 +25,7 @@ impl Instruction for Opcode0x8xy4 {
         _memory: &mut Memory,
         register: &mut Register,
         _graphic: &mut Graphic,
-        _keyboard_bus: &mut mpsc::Receiver<u8>,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         let (result, overflowing) = register.v[self.vx].overflowing_add(register.v[self.vy]);
         register.v[self.vx] = result;
@@ -53,8 +53,10 @@ mod test {
         let mut register = Register::new();
         register.v[1] = 250;
         register.v[2] = 10;
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 2);
         assert_eq!(register.v[1], 4);
         assert_eq!(register.v[15], 1);
@@ -68,8 +70,10 @@ mod test {
         let mut register = Register::new();
         register.v[1] = 5;
         register.v[2] = 10;
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 2);
         assert_eq!(register.v[1], 15);
         assert_eq!(register.v[15], 0);

@@ -19,7 +19,7 @@ impl Instruction for Opcode0x0nnn {
         _memory: &mut Memory,
         _register: &mut Register,
         _graphic: &mut Graphic,
-        _keyboard_bus: &mut mpsc::Receiver<u8>,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         // Do Nothing
     }
@@ -34,8 +34,12 @@ mod test {
         let opcode = Opcode0x0nnn::new();
         let mut memory = Memory::new();
         let mut register = Register::new();
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 0);
         assert_eq!(register.sp, 0);
     }

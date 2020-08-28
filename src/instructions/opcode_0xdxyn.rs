@@ -30,7 +30,7 @@ impl Instruction for Opcode0xdxyn {
         memory: &mut Memory,
         register: &mut Register,
         graphic: &mut Graphic,
-        keyboard_bus: &mut mpsc::Receiver<u8>,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         let start = register.i as usize;
         let end = register.i as usize + self.nibble as usize;
@@ -71,9 +71,12 @@ mod test {
         register.v[0x1] = x as u8;
         register.v[0x2] = y as u8;
 
-        let mut graphic = Graphic::new();
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
 
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (_, receiver) = mpsc::channel();
+
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
 
         assert_eq!(graphic.gfx[y * 64 + (x + 0)], 1);
         assert_eq!(graphic.gfx[y * 64 + (x + 1)], 1);
@@ -121,7 +124,8 @@ mod test {
         register.v[0x1] = x as u8;
         register.v[0x2] = y as u8;
 
-        let mut graphic = Graphic::new();
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
         graphic.gfx[0] = 1;
         graphic.gfx[1] = 0;
         graphic.gfx[2] = 0;
@@ -131,7 +135,9 @@ mod test {
         graphic.gfx[6] = 0;
         graphic.gfx[7] = 0;
 
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (_, receiver) = mpsc::channel();
+
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
 
         assert_eq!(graphic.gfx[0], 0);
         assert_eq!(graphic.gfx[1], 1);

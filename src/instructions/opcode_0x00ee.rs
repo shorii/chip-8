@@ -18,7 +18,7 @@ impl Instruction for Opcode0x00ee {
         memory: &mut Memory,
         register: &mut Register,
         _graphic: &mut Graphic,
-        keyboard_bus: &mut mpsc::Receiver<u8>,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         let return_address = memory.stack[register.sp as usize];
         register.sp = match register.sp.checked_sub(1) {
@@ -42,8 +42,13 @@ mod test {
         memory.stack[2] = 3;
         let mut register = Register::new();
         register.sp = 2;
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+
+        let (_, receiver) = mpsc::channel();
+
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 3);
         assert_eq!(register.sp, 1);
     }

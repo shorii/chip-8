@@ -24,7 +24,7 @@ impl Instruction for Opcode0x5xy0 {
         _memory: &mut Memory,
         register: &mut Register,
         _graphic: &mut Graphic,
-        _keyboard_bus: &mut mpsc::Receiver<u8>,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         let mut increment = 0;
         if register.v[self.vx] == register.v[self.vy] {
@@ -50,8 +50,10 @@ mod test {
         let mut register = Register::new();
         register.v[1] = 0x23;
         register.v[10] = 0x23;
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 4);
     }
 
@@ -63,8 +65,10 @@ mod test {
         let mut register = Register::new();
         register.v[1] = 0x23;
         register.v[10] = 0x24;
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 2);
     }
 }

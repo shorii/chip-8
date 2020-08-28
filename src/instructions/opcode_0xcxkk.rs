@@ -27,7 +27,7 @@ impl Instruction for Opcode0xcxkk {
         _memory: &mut Memory,
         register: &mut Register,
         _graphic: &mut Graphic,
-        _keyboard_bus: &mut mpsc::Receiver<u8>,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         register.v[self.vx] = self.random_byte & self.byte;
         register.pc = match register.pc.checked_add(2) {
@@ -51,8 +51,10 @@ mod test {
         };
         let mut memory = Memory::new();
         let mut register = Register::new();
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 2);
         assert_eq!(register.v[3], 2);
     }

@@ -31,7 +31,7 @@ pub trait Instruction {
         memory: &mut Memory,
         register: &mut Register,
         graphic: &mut Graphic,
-        keyboard_bus: &mut mpsc::Receiver<u8>,
+        keyboard_bus: &mpsc::Receiver<u8>,
     );
 }
  

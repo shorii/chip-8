@@ -21,7 +21,7 @@ impl Instruction for Opcode0xbnnn {
         _memory: &mut Memory,
         register: &mut Register,
         _graphic: &mut Graphic,
-        _keyboard_bus: &mut mpsc::Receiver<u8>,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         let address = match self.address.checked_add(register.v[0] as u16) {
             Some(value) => value,
@@ -42,8 +42,10 @@ mod test {
         let mut memory = Memory::new();
         let mut register = Register::new();
         register.v[0] = 0x1;
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 0x12f);
     }
 }

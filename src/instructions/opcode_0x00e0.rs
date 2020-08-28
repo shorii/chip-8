@@ -17,7 +17,7 @@ impl Instruction for Opcode0x00e0 {
         _memory: &mut Memory,
         _register: &mut Register,
         graphic: &mut Graphic,
-        keyboard_bus: &mut mpsc::Receiver<u8>
+        _keyboard_bus: &mpsc::Receiver<u8>
     ) {
         graphic.clear();
     }
@@ -32,9 +32,11 @@ mod test {
         let opcode = Opcode0x00e0::new();
         let mut memory = Memory::new();
         let mut register = Register::new();
-        let mut graphic = Graphic::new();
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
         graphic.gfx = [1; 2048];
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         for gfx in graphic.gfx.iter() {
             assert_eq!(*gfx, 0);
         }

@@ -21,7 +21,7 @@ impl Instruction for Opcode0xannn {
         _memory: &mut Memory,
         register: &mut Register,
         _graphic: &mut Graphic,
-        _keyboard_bus: &mut mpsc::Receiver<u8>,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         register.i = self.address;
         register.pc = match register.pc.checked_add(2) {
@@ -41,8 +41,10 @@ mod test {
         let opcode = Opcode0xannn::new(instruction);
         let mut memory = Memory::new();
         let mut register = Register::new();
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 2);
         assert_eq!(register.i, 0x12e);
     }

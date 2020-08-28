@@ -22,7 +22,7 @@ impl Instruction for Opcode0x8xye {
         _memory: &mut Memory,
         register: &mut Register,
         _graphic: &mut Graphic,
-        _keyboard_bus: &mut mpsc::Receiver<u8>,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         let most_significant_bit = ((register.v[self.vx] & 0x80) >> 7) as u8;
         if most_significant_bit == 1 {
@@ -49,8 +49,10 @@ mod test {
         let mut memory = Memory::new();
         let mut register = Register::new();
         register.v[1] = 200;
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 2);
         assert_eq!(register.v[1], 144);
         assert_eq!(register.v[15], 1);
@@ -63,8 +65,10 @@ mod test {
         let mut memory = Memory::new();
         let mut register = Register::new();
         register.v[1] = 25;
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 2);
         assert_eq!(register.v[1], 50);
         assert_eq!(register.v[15], 0);

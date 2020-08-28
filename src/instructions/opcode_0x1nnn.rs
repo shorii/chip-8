@@ -20,7 +20,7 @@ impl Instruction for Opcode0x1nnn {
         _memory: &mut Memory,
         register: &mut Register,
         _graphic: &mut Graphic,
-        keyboard: &mut mpsc::Receiver<u8>
+        _keyboard_bus: &mpsc::Receiver<u8>
     ) {
         register.pc = self.address;
     }
@@ -37,8 +37,10 @@ mod test {
         let mut memory = Memory::new();
         let mut register = Register::new();
         register.pc = 1;
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 0x123);
         assert_eq!(register.sp, 0);
         assert_eq!(memory.stack[0], 0);
