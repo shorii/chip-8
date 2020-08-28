@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Set Vx = Vx - Vy, set VF = NOT borrow.
 /// If Vx > Vy, the VF is set to 1, otherwise 0.
@@ -18,7 +19,13 @@ impl Opcode0x8xy5 {
 }
 
 impl Instruction for Opcode0x8xy5 {
-    fn execute(&self, _memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        _memory: &mut Memory,
+        register: &mut Register,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mpsc::Receiver<u8>,
+    ) {
         let (result, borrowing) = register.v[self.vx].overflowing_sub(register.v[self.vy]);
         register.v[self.vx] = result;
         if borrowing {
@@ -45,8 +52,10 @@ mod test {
         let mut register = Register::new();
         register.v[1] = 250;
         register.v[2] = 10;
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 2);
         assert_eq!(register.v[1], 240);
         assert_eq!(register.v[15], 1);
@@ -60,8 +69,10 @@ mod test {
         let mut register = Register::new();
         register.v[1] = 5;
         register.v[2] = 10;
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 2);
         assert_eq!(register.v[1], 251);
         assert_eq!(register.v[15], 0);

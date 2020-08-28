@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Jump to a machine code routine at nnn.
 /// This instruction is only used on the old computers on which Chip-8 was originally implemented.
@@ -13,7 +14,13 @@ impl Opcode0x0nnn {
 }
 
 impl Instruction for Opcode0x0nnn {
-    fn execute(&self, _memory: &mut Memory, _register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        _memory: &mut Memory,
+        _register: &mut Register,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mpsc::Receiver<u8>,
+    ) {
         // Do Nothing
     }
 }
@@ -27,8 +34,12 @@ mod test {
         let opcode = Opcode0x0nnn::new();
         let mut memory = Memory::new();
         let mut register = Register::new();
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 0);
         assert_eq!(register.sp, 0);
     }

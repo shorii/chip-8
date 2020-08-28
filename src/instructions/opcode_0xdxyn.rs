@@ -1,5 +1,6 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
+use std::sync::mpsc;
 
 /// Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
 /// The interpreter reads n bytes from memory, starting at the address stored in I.
@@ -24,7 +25,13 @@ impl Opcode0xdxyn {
 }
 
 impl Instruction for Opcode0xdxyn {
-    fn execute(&self, memory: &mut Memory, register: &mut Register, graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        memory: &mut Memory,
+        register: &mut Register,
+        graphic: &mut Graphic,
+        _keyboard_bus: &mpsc::Receiver<u8>,
+    ) {
         let start = register.i as usize;
         let end = register.i as usize + self.nibble as usize;
         let sprite = &memory.all[start..end];
@@ -64,9 +71,12 @@ mod test {
         register.v[0x1] = x as u8;
         register.v[0x2] = y as u8;
 
-        let mut graphic = Graphic::new();
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
 
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (_, receiver) = mpsc::channel();
+
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
 
         assert_eq!(graphic.gfx[y * 64 + (x + 0)], 1);
         assert_eq!(graphic.gfx[y * 64 + (x + 1)], 1);
@@ -114,7 +124,8 @@ mod test {
         register.v[0x1] = x as u8;
         register.v[0x2] = y as u8;
 
-        let mut graphic = Graphic::new();
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
         graphic.gfx[0] = 1;
         graphic.gfx[1] = 0;
         graphic.gfx[2] = 0;
@@ -124,7 +135,9 @@ mod test {
         graphic.gfx[6] = 0;
         graphic.gfx[7] = 0;
 
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (_, receiver) = mpsc::channel();
+
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
 
         assert_eq!(graphic.gfx[0], 0);
         assert_eq!(graphic.gfx[1], 1);

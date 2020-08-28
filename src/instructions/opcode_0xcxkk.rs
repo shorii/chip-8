@@ -1,6 +1,7 @@
 use crate::instructions::Instruction;
 use crate::emulator::{Memory, Register, Graphic};
 use rand::prelude::*;
+use std::sync::mpsc;
 
 /// Set Vx = random byte AND kk.
 /// The interpreter generates a random number from 0 to 255, which is the ANDed with the value kk.
@@ -21,7 +22,13 @@ impl Opcode0xcxkk {
 }
 
 impl Instruction for Opcode0xcxkk {
-    fn execute(&self, _memory: &mut Memory, register: &mut Register, _graphic: &mut Graphic) {
+    fn execute(
+        &self,
+        _memory: &mut Memory,
+        register: &mut Register,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mpsc::Receiver<u8>,
+    ) {
         register.v[self.vx] = self.random_byte & self.byte;
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
@@ -44,8 +51,10 @@ mod test {
         };
         let mut memory = Memory::new();
         let mut register = Register::new();
-        let mut graphic = Graphic::new();
-        opcode.execute(&mut memory, &mut register, &mut graphic);
+        let (sender, _) = mpsc::channel();
+        let mut graphic = Graphic::new(sender);
+        let (_, receiver) = mpsc::channel();
+        opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 2);
         assert_eq!(register.v[3], 2);
     }
