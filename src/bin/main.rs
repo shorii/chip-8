@@ -65,13 +65,12 @@ fn main() {
     let keypad = Keypad::new(key_event_sender);
 
     let memory = Memory::new();
-    let register = Register::new();
+    let register = Register::new(Arc::clone(&terminated));
     let mut emulator = Cpu::new(
         memory,
         register,
         graphic,
-        key_event_receiver,
-        Arc::clone(&terminated)
+        key_event_receiver
     );
     let mut console = Console::new(
         graphic_receiver,
@@ -79,6 +78,6 @@ fn main() {
         Arc::clone(&terminated)
     ).unwrap();
     console.run();
-    emulator.execute();
+    emulator.execute(Arc::clone(&terminated));
     console.join();
 }
