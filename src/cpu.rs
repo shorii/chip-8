@@ -19,19 +19,18 @@ pub struct Register {
 
 // XXX depricated
 impl Register {
-    pub fn new(terminated: Arc<AtomicBool>) -> Self {
-        let register = Register {
+    pub fn new() -> Self {
+        Register {
             pc: 0,
             sp: 0,
             i: 0,
             v: [0; 16],
             delay_timer: Arc::new(Mutex::new(0)),
             sound_timer: Arc::new(Mutex::new(0)),
-        };
-        register
+        }
     }
 
-    fn run_timer(&self, terminated: Arc<AtomicBool>) {
+    pub fn run_timer(&self, terminated: Arc<AtomicBool>) {
         let mut delay_timer = Arc::clone(&self.delay_timer);
         let mut sound_timer = Arc::clone(&self.sound_timer);
         let interval = time::Duration::from_millis(15);
@@ -44,6 +43,7 @@ impl Register {
                     *dt = dt.checked_sub(1).unwrap();
                 }
                 if *st > 0 {
+                    // TODO beeping here
                     *st = st.checked_sub(1).unwrap();
                 }
             }

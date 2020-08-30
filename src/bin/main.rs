@@ -65,7 +65,7 @@ fn main() {
     let keypad = Keypad::new(key_event_sender);
 
     let memory = Memory::new();
-    let register = Register::new(Arc::clone(&terminated));
+    let register = Register::new();
     let mut emulator = Cpu::new(
         memory,
         register,

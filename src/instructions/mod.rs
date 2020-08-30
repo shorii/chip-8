@@ -26,6 +26,11 @@ mod opcode_0xcxkk;
 mod opcode_0xdxyn;
 mod opcode_0xex9e;
 mod opcode_0xexa1;
+mod opcode_0xfx07;
+mod opcode_0xfx0a;
+mod opcode_0xfx15;
+mod opcode_0xfx18;
+mod opcode_0xfx1e;
 
 pub trait Instruction {
     fn execute(
@@ -84,6 +89,17 @@ impl From<[u8; 2]> for Box<dyn Instruction> {
                     _ => panic!("unsupported operator"),
                 }
             },
+            0xf => {
+                let suffix = opcode[1];
+                match suffix {
+                    0x07 => Box::new(opcode_0xfx07::Opcode0xfx07::new(instruction)),
+                    0x0a => Box::new(opcode_0xfx0a::Opcode0xfx0a::new(instruction)),
+                    0x15 => Box::new(opcode_0xfx15::Opcode0xfx15::new(instruction)),
+                    0x18 => Box::new(opcode_0xfx18::Opcode0xfx18::new(instruction)),
+                    0x1e => Box::new(opcode_0xfx1e::Opcode0xfx1e::new(instruction)),
+                    _ => panic!("unsupported operator"),
+                }
+            }
             _ => panic!("unsupported operator"),
         }
     }
