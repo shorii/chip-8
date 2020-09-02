@@ -1,8 +1,8 @@
 use std::convert::TryFrom;
 
-const FONT_BASE: usize = 0;
+pub const FONT_BASE: usize = 0;
 
-const FONT_LENGTH: usize = 5;
+pub const FONT_LENGTH: usize = 5;
 
 const fonts: [u8; 80] = [
     0xf0, 0x90, 0x90, 0x90, 0xf0, // 0
