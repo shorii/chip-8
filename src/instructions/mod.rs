@@ -20,6 +20,7 @@ mod opcode_0x8xy5;
 mod opcode_0x8xy6;
 mod opcode_0x8xy7;
 mod opcode_0x8xye;
+mod opcode_0x9xy0;
 mod opcode_0xannn;
 mod opcode_0xbnnn;
 mod opcode_0xcxkk;
@@ -81,6 +82,7 @@ impl From<[u8; 2]> for Box<dyn Instruction> {
                     _ => panic!("unsupported operator")
                 }
             },
+            0x9 => Box::new(opcode_0x9xy0::Opcode0x9xy0::new(instruction)),
             0xa => Box::new(opcode_0xannn::Opcode0xannn::new(instruction)),
             0xb => Box::new(opcode_0xbnnn::Opcode0xbnnn::new(instruction)),
             0xc => Box::new(opcode_0xcxkk::Opcode0xcxkk::new(instruction)),

@@ -1,4 +1,7 @@
 use std::convert::TryFrom;
+use std::path::Path;
+use std::fs::File;
+use std::io::prelude::*;
 
 pub const FONT_BASE: usize = 0;
 
@@ -32,11 +35,24 @@ pub struct Memory{
     pub stack: [u16; 16],
 }
 
-// XXX depricated
 impl Memory {
-    pub fn new() -> Self {
+    pub fn new<P: AsRef<Path>>(rom: P) -> Self {
+        let mut all = [0; 4096];
+
+        let mut fonts_copy = fonts;
+        fonts_copy.swap_with_slice(&mut all[0..80]);
+
+        let mut fd = File::open(rom).unwrap();
+        let mut rom_data = Vec::new();
+        fd.read_to_end(&mut rom_data).unwrap();
+
+        let start = 0x200;
+        let end = start + rom_data.len();
+
+        rom_data.swap_with_slice(&mut all[start..end]);
+
         Memory {
-            all: [0; 4096],
+            all,
             stack: [0; 16],
         }
     }

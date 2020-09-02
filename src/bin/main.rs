@@ -5,6 +5,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use std::collections::HashMap;
 use std::sync::atomic::AtomicBool;
+use std::env;
 
 struct Keypad {
     keyMap: HashMap<char, u8>,
@@ -53,6 +54,11 @@ impl Keyboard for Keypad {
 
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+    assert_eq!(args.len(), 2);
+
+    let rom_location = &args[1];
+
     let terminated = Arc::new(AtomicBool::new(false));
 
     // graphic setup
@@ -64,7 +70,7 @@ fn main() {
     let key_event_sender = Arc::new(Mutex::new(key_event_sender));
     let keypad = Keypad::new(key_event_sender);
 
-    let memory = Memory::new();
+    let memory = Memory::new(rom_location);
     let register = Register::new();
     let mut emulator = Cpu::new(
         memory,
