@@ -20,11 +20,11 @@ impl Instruction for Opcode0x00ee {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        let return_address = memory.stack[register.sp as usize];
         register.sp = match register.sp.checked_sub(1) {
             Some(value) => value,
             None => panic!("stack pointer exceed limitation"),
         };
+        let return_address = memory.stack[register.sp as usize];
         register.pc = return_address;
     }
 }

@@ -54,7 +54,7 @@ impl From<[u8; 2]> for Box<dyn Instruction> {
         match operator {
             0x0 => {
                 match instruction {
-                    0x00EF => Box::new(opcode_0x00ee::Opcode0x00ee::new()),
+                    0x00EE => Box::new(opcode_0x00ee::Opcode0x00ee::new()),
                     0x00E0 => Box::new(opcode_0x00e0::Opcode0x00e0::new()),
                     _ => Box::new(opcode_0x0nnn::Opcode0x0nnn::new()),
                 }
@@ -79,7 +79,11 @@ impl From<[u8; 2]> for Box<dyn Instruction> {
                     0x6 => Box::new(opcode_0x8xy6::Opcode0x8xy6::new(instruction)),
                     0x7 => Box::new(opcode_0x8xy7::Opcode0x8xy7::new(instruction)),
                     0xe => Box::new(opcode_0x8xye::Opcode0x8xye::new(instruction)),
-                    _ => panic!("unsupported operator")
+                    _ => panic!(
+                        "unsupported operator {prefix:x?}{suffix:x?}",
+                        prefix=opcode[0],
+                        suffix=opcode[1],
+                    )
                 }
             },
             0x9 => Box::new(opcode_0x9xy0::Opcode0x9xy0::new(instruction)),
@@ -90,9 +94,13 @@ impl From<[u8; 2]> for Box<dyn Instruction> {
             0xe => {
                 let suffix = opcode[1];
                 match suffix {
-                    0x9F => Box::new(opcode_0xex9e::Opcode0xex9e::new(instruction)),
+                    0x9E => Box::new(opcode_0xex9e::Opcode0xex9e::new(instruction)),
                     0xA1 => Box::new(opcode_0xexa1::Opcode0xexa1::new(instruction)),
-                    _ => panic!("unsupported operator"),
+                    _ => panic!(
+                        "unsupported operator {prefix:x?}{suffix:x?}",
+                        prefix=opcode[0],
+                        suffix=opcode[1],
+                    )
                 }
             },
             0xf => {
@@ -107,10 +115,18 @@ impl From<[u8; 2]> for Box<dyn Instruction> {
                     0x33 => Box::new(opcode_0xfx33::Opcode0xfx33::new(instruction)),
                     0x55 => Box::new(opcode_0xfx55::Opcode0xfx55::new(instruction)),
                     0x65 => Box::new(opcode_0xfx65::Opcode0xfx65::new(instruction)),
-                    _ => panic!("unsupported operator"),
+                    _ => panic!(
+                        "unsupported operator {prefix:x?}{suffix:x?}",
+                        prefix=opcode[0],
+                        suffix=opcode[1],
+                    )
                 }
             }
-            _ => panic!("unsupported operator"),
+            _ => panic!(
+                "unsupported operator {prefix:x?}{suffix:x?}",
+                prefix=opcode[0],
+                suffix=opcode[1],
+            )
         }
     }
 }
