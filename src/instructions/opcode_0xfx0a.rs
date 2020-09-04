@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Wait for a key press, store the value of the key in Vx.
@@ -9,7 +9,7 @@ pub struct Opcode0xfx0a {
 }
 
 impl Opcode0xfx0a {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let vx = ((instruction & 0x0F00) >> 8) as usize;
         Opcode0xfx0a { vx }
     }
@@ -18,20 +18,20 @@ impl Opcode0xfx0a {
 impl Instruction for Opcode0xfx0a {
     fn execute(
         &self,
-        memory: &mut Memory,
+        _memory: &mut Memory,
         register: &mut Register,
-        graphic: &mut Graphic,
+        _graphic: &mut Graphic,
         keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         match keyboard_bus.recv() {
             Ok(key) => {
                 register.v[self.vx] = key;
-            },
-            _ => { /* do nothing*/ },
+            }
+            _ => { /* do nothing*/ }
         }
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
-            None => panic!("program counter exceeds limitation")
+            None => panic!("program counter exceeds limitation"),
         }
     }
 }
@@ -52,7 +52,7 @@ mod test {
         let mut graphic = Graphic::new(sender);
 
         let (sender, receiver) = mpsc::channel();
-        sender.send(0x9);
+        sender.send(0x9).unwrap();
 
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
 

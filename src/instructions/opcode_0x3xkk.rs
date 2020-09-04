@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Skip next instruction if Vx = kk.
@@ -11,7 +11,7 @@ pub struct Opcode0x3xkk {
 }
 
 impl Opcode0x3xkk {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let vx = ((instruction & 0x0F00) >> 8) as usize;
         let byte = (instruction & 0x00FF) as u8;
         Opcode0x3xkk { vx, byte }
@@ -33,7 +33,7 @@ impl Instruction for Opcode0x3xkk {
         increment += 2;
         register.pc = match register.pc.checked_add(increment) {
             Some(value) => value,
-            None => panic!("program counter exceeds limitation")
+            None => panic!("program counter exceeds limitation"),
         }
     }
 }

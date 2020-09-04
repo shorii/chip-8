@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
@@ -16,7 +16,7 @@ pub struct Opcode0xdxyn {
 }
 
 impl Opcode0xdxyn {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let vx = ((instruction & 0x0F00) >> 8) as usize;
         let vy = ((instruction & 0x00F0) >> 4) as usize;
         let nibble = (instruction & 0x000F) as u8;
@@ -36,7 +36,9 @@ impl Instruction for Opcode0xdxyn {
         let end = register.i as usize + self.nibble as usize;
         let sprite = &memory.all[start..end];
         let collision = graphic.set_sprite(
-            register.v[self.vx] as usize, register.v[self.vy] as usize, sprite
+            register.v[self.vx] as usize,
+            register.v[self.vy] as usize,
+            sprite,
         );
         if collision {
             register.v[0xF] = 1;
@@ -45,7 +47,7 @@ impl Instruction for Opcode0xdxyn {
         }
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
-            None => panic!("program counter exceeds limitation")
+            None => panic!("program counter exceeds limitation"),
         }
     }
 }

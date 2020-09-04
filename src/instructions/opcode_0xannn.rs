@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Set I = nnn.
@@ -9,7 +9,7 @@ pub struct Opcode0xannn {
 }
 
 impl Opcode0xannn {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let address = (instruction & 0x0FFF) as u16;
         Opcode0xannn { address }
     }
@@ -26,7 +26,7 @@ impl Instruction for Opcode0xannn {
         register.i = self.address;
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
-            None => panic!("program counter exceeds limitation")
+            None => panic!("program counter exceeds limitation"),
         }
     }
 }

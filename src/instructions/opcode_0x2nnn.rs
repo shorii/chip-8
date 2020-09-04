@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Call subroutine at nnn.
@@ -10,7 +10,7 @@ pub struct Opcode0x2nnn {
 }
 
 impl Opcode0x2nnn {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let address = instruction & 0x0FFF;
         Opcode0x2nnn { address }
     }
@@ -22,7 +22,7 @@ impl Instruction for Opcode0x2nnn {
         memory: &mut Memory,
         register: &mut Register,
         _graphic: &mut Graphic,
-        _keyboard_bus: &mpsc::Receiver<u8>
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         memory.stack[register.sp as usize] = register.pc;
         register.sp = match register.sp.checked_add(1) {

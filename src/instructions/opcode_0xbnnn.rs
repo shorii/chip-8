@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Jump to location nnn + V0.
@@ -9,7 +9,7 @@ pub struct Opcode0xbnnn {
 }
 
 impl Opcode0xbnnn {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let address = (instruction & 0x0FFF) as u16;
         Opcode0xbnnn { address }
     }
@@ -25,7 +25,7 @@ impl Instruction for Opcode0xbnnn {
     ) {
         let address = match self.address.checked_add(register.v[0] as u16) {
             Some(value) => value,
-            None => panic!("invalid address access")
+            None => panic!("invalid address access"),
         };
         register.pc = address;
     }

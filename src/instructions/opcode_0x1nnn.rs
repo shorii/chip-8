@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Jump to location nnn.
@@ -8,7 +8,7 @@ pub struct Opcode0x1nnn {
 }
 
 impl Opcode0x1nnn {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let address = instruction & 0x0FFF;
         Opcode0x1nnn { address }
     }
@@ -20,7 +20,7 @@ impl Instruction for Opcode0x1nnn {
         _memory: &mut Memory,
         register: &mut Register,
         _graphic: &mut Graphic,
-        _keyboard_bus: &mpsc::Receiver<u8>
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         register.pc = self.address;
     }

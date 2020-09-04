@@ -1,12 +1,12 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Clear the display.
 pub struct Opcode0x00e0;
 
 impl Opcode0x00e0 {
-    pub fn new() -> Self{
+    pub fn new() -> Self {
         Opcode0x00e0
     }
 }
@@ -17,7 +17,7 @@ impl Instruction for Opcode0x00e0 {
         _memory: &mut Memory,
         _register: &mut Register,
         graphic: &mut Graphic,
-        _keyboard_bus: &mpsc::Receiver<u8>
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         graphic.clear();
     }

@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Read registers V0 through Vx from memory starting at location I.
@@ -9,7 +9,7 @@ pub struct Opcode0xfx65 {
 }
 
 impl Opcode0xfx65 {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let vx = ((instruction & 0x0F00) >> 8) as usize;
         Opcode0xfx65 { vx }
     }
@@ -20,15 +20,15 @@ impl Instruction for Opcode0xfx65 {
         &self,
         memory: &mut Memory,
         register: &mut Register,
-        graphic: &mut Graphic,
-        keyboard_bus: &mpsc::Receiver<u8>,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         let start = register.i as usize;
         let end = register.i.checked_add(self.vx as u16).unwrap() as usize;
         memory.all[start..=end].swap_with_slice(&mut register.v[0..=self.vx as usize]);
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
-            None => panic!("program counter exceeds limitation")
+            None => panic!("program counter exceeds limitation"),
         };
     }
 }

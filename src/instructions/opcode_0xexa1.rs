@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Skip next instruction if key with the value of Vx is not pressed.
@@ -10,7 +10,7 @@ pub struct Opcode0xexa1 {
 }
 
 impl Opcode0xexa1 {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let vx = ((instruction & 0x0F00) >> 8) as usize;
         Opcode0xexa1 { vx }
     }
@@ -19,24 +19,24 @@ impl Opcode0xexa1 {
 impl Instruction for Opcode0xexa1 {
     fn execute(
         &self,
-        memory: &mut Memory,
+        _memory: &mut Memory,
         register: &mut Register,
-        graphic: &mut Graphic,
+        _graphic: &mut Graphic,
         keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         match keyboard_bus.try_recv() {
-            Ok(value) if value == register.v[self.vx] => { /* do nothing */ },
+            Ok(value) if value == register.v[self.vx] => { /* do nothing */ }
             _ => {
                 register.pc = match register.pc.checked_add(2) {
                     Some(value) => value,
-                    None => panic!("program counter exceeds limitation")
+                    None => panic!("program counter exceeds limitation"),
                 }
             }
         };
 
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
-            None => panic!("program counter exceeds limitation")
+            None => panic!("program counter exceeds limitation"),
         }
     }
 }
@@ -59,7 +59,7 @@ mod test {
         let mut graphic = Graphic::new(sender);
 
         let (sender, receiver) = mpsc::channel();
-        sender.send(0x4);
+        sender.send(0x4).unwrap();
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 2);
     }
@@ -78,7 +78,7 @@ mod test {
         let mut graphic = Graphic::new(sender);
 
         let (sender, receiver) = mpsc::channel();
-        sender.send(0x4);
+        sender.send(0x4).unwrap();
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 4);
     }

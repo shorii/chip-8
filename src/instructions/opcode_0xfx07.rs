@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Set Vx = delay timer value.
@@ -9,7 +9,7 @@ pub struct Opcode0xfx07 {
 }
 
 impl Opcode0xfx07 {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let vx = ((instruction & 0x0F00) >> 8) as usize;
         Opcode0xfx07 { vx }
     }
@@ -18,16 +18,16 @@ impl Opcode0xfx07 {
 impl Instruction for Opcode0xfx07 {
     fn execute(
         &self,
-        memory: &mut Memory,
+        _memory: &mut Memory,
         register: &mut Register,
-        graphic: &mut Graphic,
-        keyboard_bus: &mpsc::Receiver<u8>,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         let dt = register.delay_timer.lock().unwrap();
         register.v[self.vx] = *dt;
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
-            None => panic!("program counter exceeds limitation")
+            None => panic!("program counter exceeds limitation"),
         }
     }
 }

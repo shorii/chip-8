@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Return from a subroutine.
@@ -7,7 +7,7 @@ use std::sync::mpsc;
 pub struct Opcode0x00ee;
 
 impl Opcode0x00ee {
-    pub fn new() -> Self{
+    pub fn new() -> Self {
         Opcode0x00ee
     }
 }

@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Set Vx = Vx SHR 1.
@@ -10,7 +10,7 @@ pub struct Opcode0x8xye {
 }
 
 impl Opcode0x8xye {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let vx = ((instruction & 0x0F00) >> 8) as usize;
         Opcode0x8xye { vx }
     }
@@ -33,7 +33,7 @@ impl Instruction for Opcode0x8xye {
         register.v[self.vx] <<= 1;
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
-            None => panic!("program counter exceeds limitation")
+            None => panic!("program counter exceeds limitation"),
         }
     }
 }

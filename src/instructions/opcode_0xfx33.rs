@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Store BCD representaion of Vx in memory locations, I, I+1, and I+2.
@@ -10,7 +10,7 @@ pub struct Opcode0xfx33 {
 }
 
 impl Opcode0xfx33 {
-    pub fn new(instruction: u16) -> Self{
+    pub fn new(instruction: u16) -> Self {
         let vx = ((instruction & 0x0F00) >> 8) as usize;
         Opcode0xfx33 { vx }
     }
@@ -21,17 +21,23 @@ impl Instruction for Opcode0xfx33 {
         &self,
         memory: &mut Memory,
         register: &mut Register,
-        graphic: &mut Graphic,
-        keyboard_bus: &mpsc::Receiver<u8>,
+        _graphic: &mut Graphic,
+        _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         memory.all[register.i as usize] = register.v[self.vx].checked_div(100).unwrap();
-        memory.all[register.i as usize + 1] = register.v[self.vx].checked_div(10).unwrap()
-                                                                 .checked_rem(10).unwrap();
-        memory.all[register.i as usize + 2] = register.v[self.vx].checked_rem(100).unwrap()
-                                                                 .checked_rem(10).unwrap();
+        memory.all[register.i as usize + 1] = register.v[self.vx]
+            .checked_div(10)
+            .unwrap()
+            .checked_rem(10)
+            .unwrap();
+        memory.all[register.i as usize + 2] = register.v[self.vx]
+            .checked_rem(100)
+            .unwrap()
+            .checked_rem(10)
+            .unwrap();
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
-            None => panic!("program counter exceeds limitation")
+            None => panic!("program counter exceeds limitation"),
         };
     }
 }

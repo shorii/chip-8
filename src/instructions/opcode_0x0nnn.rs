@@ -1,5 +1,5 @@
+use crate::emulator::{Graphic, Memory, Register};
 use crate::instructions::Instruction;
-use crate::emulator::{Memory, Register, Graphic};
 use std::sync::mpsc;
 
 /// Jump to a machine code routine at nnn.
@@ -8,7 +8,7 @@ use std::sync::mpsc;
 pub struct Opcode0x0nnn;
 
 impl Opcode0x0nnn {
-    pub fn new() -> Self{
+    pub fn new() -> Self {
         Opcode0x0nnn
     }
 }

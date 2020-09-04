@@ -1,10 +1,10 @@
+use super::graphic::Graphic;
 use super::instructions::Instruction;
 use super::memory::Memory;
-use super::graphic::Graphic;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::mpsc;
 use std::sync::Arc;
 use std::sync::Mutex;
-use std::sync::mpsc;
 use std::thread;
 use std::time;
 
@@ -17,7 +17,6 @@ pub struct Register {
     pub sound_timer: Arc<Mutex<u8>>,
 }
 
-// XXX depricated
 impl Register {
     pub fn new() -> Self {
         Register {
@@ -31,8 +30,8 @@ impl Register {
     }
 
     pub fn run_timer(&self, terminated: Arc<AtomicBool>) {
-        let mut delay_timer = Arc::clone(&self.delay_timer);
-        let mut sound_timer = Arc::clone(&self.sound_timer);
+        let delay_timer = Arc::clone(&self.delay_timer);
+        let sound_timer = Arc::clone(&self.sound_timer);
         let interval = time::Duration::from_millis(15);
         thread::spawn(move || {
             while !terminated.load(Ordering::Relaxed) {
@@ -65,7 +64,12 @@ impl Cpu {
         graphic: Graphic,
         keyboard_bus: mpsc::Receiver<u8>,
     ) -> Self {
-        Cpu {memory, register, graphic, keyboard_bus}
+        Cpu {
+            memory,
+            register,
+            graphic,
+            keyboard_bus,
+        }
     }
 
     pub fn execute(&mut self, terminated: Arc<AtomicBool>) {
