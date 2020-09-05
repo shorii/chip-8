@@ -24,7 +24,7 @@ impl Instruction for Opcode0x2nnn {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        memory.stack[register.sp as usize] = register.pc;
+        memory.stack[register.sp as usize] = register.pc.checked_add(2).unwrap();
         register.sp = match register.sp.checked_add(1) {
             Some(value) => value,
             None => panic!("stack pointer exceed limitation"),

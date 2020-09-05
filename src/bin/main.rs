@@ -1,14 +1,14 @@
-use chip_8::emulator::{Memory, Register, Graphic, Cpu};
-use console::{Keyboard, Graphic as ConsoleGraphic, Console};
+use chip_8::emulator::{Cpu, Graphic, Memory, Register};
+use console::{Console, Keyboard};
+use std::collections::HashMap;
+use std::env;
+use std::sync::atomic::AtomicBool;
 use std::sync::mpsc;
 use std::sync::Arc;
 use std::sync::Mutex;
-use std::collections::HashMap;
-use std::sync::atomic::AtomicBool;
-use std::env;
 
 struct Keypad {
-    keyMap: HashMap<char, u8>,
+    keymap: HashMap<char, u8>,
     bus: Arc<Mutex<mpsc::Sender<u8>>>,
 }
 
@@ -19,39 +19,35 @@ impl Keypad {
             ('2', 0x2),
             ('3', 0x3),
             ('4', 0xc),
-
             ('q', 0x4),
             ('w', 0x5),
             ('e', 0x6),
             ('r', 0xd),
-
             ('a', 0x7),
             ('s', 0x8),
             ('d', 0x9),
             ('f', 0xe),
-
             ('z', 0xa),
             ('x', 0x0),
             ('c', 0xb),
             ('v', 0xf),
         ];
-        let keyMap = map.iter().cloned().collect::<HashMap<_, _>>();
-        Keypad { keyMap, bus }
+        let keymap = map.iter().cloned().collect::<HashMap<_, _>>();
+        Keypad { keymap, bus }
     }
 }
 
 impl Keyboard for Keypad {
     fn press(&self, key: char) {
-        match self.keyMap.get(&key) {
+        match self.keymap.get(&key) {
             Some(value) => {
                 let bus = self.bus.lock().unwrap();
-                bus.send(*value);
-            },
-            None => {/* do nothing */}
+                bus.send(*value).unwrap();
+            }
+            None => { /* do nothing */ }
         }
     }
 }
-
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -70,14 +66,10 @@ fn main() {
     let key_event_sender = Arc::new(Mutex::new(key_event_sender));
     let keypad = Keypad::new(key_event_sender);
 
-    let memory = Memory::new(rom_location);
+    let mut memory = Memory::new();
+    memory.load(rom_location);
     let register = Register::new();
-    let mut emulator = Cpu::new(
-        memory,
-        register,
-        graphic,
-        key_event_receiver
-    );
+    let mut emulator = Cpu::new(memory, register, graphic, key_event_receiver);
     let mut console = Console::new(
         graphic_receiver,
         Box::new(keypad),
