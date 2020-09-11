@@ -15,11 +15,15 @@ impl Instruction for Opcode0x00e0 {
     fn execute(
         &self,
         _memory: &mut Memory,
-        _register: &mut Register,
+        register: &mut Register,
         graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         graphic.clear();
+        register.pc = match register.pc.checked_add(2) {
+            Some(value) => value,
+            None => panic!("program counter exceeds limitation"),
+        }
     }
 }
 
