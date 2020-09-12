@@ -3,7 +3,7 @@ use crate::instructions::Instruction;
 use std::sync::mpsc;
 
 /// Set I = I + Vx.
-/// DT is set equal to the value of Vx.
+/// The values of I and Vx are added, and the results are stored in I.
 pub struct Opcode0xfx1e {
     vx: usize,
 }

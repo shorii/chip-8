@@ -24,17 +24,11 @@ impl Instruction for Opcode0xexa1 {
         _graphic: &mut Graphic,
         keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        match keyboard_bus.try_recv() {
-            Ok(value) if value == register.v[self.vx] => { /* do nothing */ }
-            _ => {
-                register.pc = match register.pc.checked_add(2) {
-                    Some(value) => value,
-                    None => panic!("program counter exceeds limitation"),
-                }
-            }
+        let increment = match keyboard_bus.try_recv() {
+            Ok(value) if value == register.v[self.vx] => 2,
+            _ => 4,
         };
-
-        register.pc = match register.pc.checked_add(2) {
+        register.pc = match register.pc.checked_add(increment) {
             Some(value) => value,
             None => panic!("program counter exceeds limitation"),
         }

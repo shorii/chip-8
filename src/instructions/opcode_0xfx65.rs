@@ -23,9 +23,11 @@ impl Instruction for Opcode0xfx65 {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        let start = register.i as usize;
-        let end = register.i.checked_add(self.vx as u16).unwrap() as usize;
-        memory.all[start..=end].swap_with_slice(&mut register.v[0..=self.vx as usize]);
+        for index in 0..self.vx + 1 {
+            let value = memory.all[register.i as usize + index as usize];
+            register.v[index] = value;
+        }
+        register.i += (self.vx + 1) as u16;
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
             None => panic!("program counter exceeds limitation"),
