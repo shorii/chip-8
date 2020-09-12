@@ -31,7 +31,7 @@ const FONTS: [u8; 80] = [
 // 0xF00 - 0xFFF reserved for display refresh
 pub struct Memory {
     pub all: [u8; 4096],
-    pub stack: [u16; 16],
+    pub stack: Vec<u16>,
 }
 
 impl Memory {
@@ -41,7 +41,7 @@ impl Memory {
         fonts_copy.swap_with_slice(&mut all[0..80]);
         Memory {
             all: [0; 4096],
-            stack: [0; 16],
+            stack: Vec::new(),
         }
     }
 

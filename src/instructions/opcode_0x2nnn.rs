@@ -24,11 +24,7 @@ impl Instruction for Opcode0x2nnn {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        memory.stack[register.sp as usize] = register.pc.checked_add(2).unwrap();
-        register.sp = match register.sp.checked_add(1) {
-            Some(value) => value,
-            None => panic!("stack pointer exceed limitation"),
-        };
+        memory.stack.push(register.pc.checked_add(2).unwrap());
         register.pc = self.address;
     }
 }
@@ -49,7 +45,6 @@ mod test {
         let (_, receiver) = mpsc::channel();
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 0x123);
-        assert_eq!(register.sp, 1);
         assert_eq!(memory.stack[0], 1);
     }
 }

@@ -10,7 +10,6 @@ use std::time;
 
 pub struct Register {
     pub pc: u16,
-    pub sp: u16,
     pub i: u16,
     pub v: [u8; 16],
     pub delay_timer: Arc<Mutex<u8>>,
@@ -21,7 +20,6 @@ impl Register {
     pub fn new() -> Self {
         Register {
             pc: 0x200,
-            sp: 0,
             i: 0,
             v: [0; 16],
             delay_timer: Arc::new(Mutex::new(0)),
@@ -73,12 +71,14 @@ impl Cpu {
     }
 
     pub fn execute(&mut self, terminated: Arc<AtomicBool>) {
+        self.register.run_timer(Arc::clone(&terminated));
         while !terminated.load(Ordering::Relaxed) {
             // fetch using pc?
             let opcode = self.memory.read(self.register.pc);
             // recog instruction
             let instruction = Box::<dyn Instruction>::from(opcode);
             // execute
+            thread::sleep(time::Duration::from_millis(2));
             instruction.execute(
                 &mut self.memory,
                 &mut self.register,

@@ -20,12 +20,7 @@ impl Instruction for Opcode0x00ee {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        register.sp = match register.sp.checked_sub(1) {
-            Some(value) => value,
-            None => panic!("stack pointer exceed limitation"),
-        };
-        let return_address = memory.stack[register.sp as usize];
-        register.pc = return_address;
+        register.pc = memory.stack.pop().unwrap();
     }
 }
 
@@ -41,7 +36,6 @@ mod test {
         memory.stack[1] = 2;
         memory.stack[2] = 3;
         let mut register = Register::new();
-        register.sp = 2;
 
         let (sender, _) = mpsc::channel();
         let mut graphic = Graphic::new(sender);
@@ -49,7 +43,7 @@ mod test {
         let (_, receiver) = mpsc::channel();
 
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
+        assert_eq!(memory.stack, vec![1, 2]);
         assert_eq!(register.pc, 3);
-        assert_eq!(register.sp, 1);
     }
 }

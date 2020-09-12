@@ -44,6 +44,5 @@ mod test {
         let (_, receiver) = mpsc::channel();
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 0);
-        assert_eq!(register.sp, 0);
     }
 }
