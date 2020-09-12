@@ -23,13 +23,14 @@ impl Graphic {
         for (i, sprite_fragment) in sprite.iter().enumerate() {
             for xi in 0..8 {
                 let pixel = (sprite_fragment & (0x80 >> xi)) as u8;
-                let yi = y + i;
-                let index = yi
+                let mut coord_x = x + xi;
+                let mut coord_y = y + i;
+                coord_x %= 64;
+                coord_y %= 32;
+                let index = coord_y
                     .checked_mul(64)
                     .unwrap()
-                    .checked_add(x)
-                    .unwrap()
-                    .checked_add(xi)
+                    .checked_add(coord_x)
                     .unwrap();
                 if pixel != 0 {
                     let screen_pixel = self.gfx[index];
