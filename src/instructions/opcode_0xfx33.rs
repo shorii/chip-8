@@ -26,15 +26,11 @@ impl Instruction for Opcode0xfx33 {
     ) {
         memory.all[register.i as usize] = register.v[self.vx].checked_div(100).unwrap();
         memory.all[register.i as usize + 1] = register.v[self.vx]
-            .checked_div(10)
-            .unwrap()
-            .checked_rem(10)
-            .unwrap();
-        memory.all[register.i as usize + 2] = register.v[self.vx]
             .checked_rem(100)
             .unwrap()
-            .checked_rem(10)
+            .checked_div(10)
             .unwrap();
+        memory.all[register.i as usize + 2] = register.v[self.vx].checked_rem(10).unwrap();
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
             None => panic!("program counter exceeds limitation"),

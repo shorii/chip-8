@@ -23,7 +23,8 @@ impl Instruction for Opcode0xfx15 {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        register.v[self.vx] = *register.delay_timer.lock().unwrap();
+        let mut dt = register.delay_timer.lock().unwrap();
+        *dt = register.v[self.vx];
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
             None => panic!("program counter exceeds limitation"),

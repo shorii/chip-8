@@ -23,11 +23,11 @@ impl Instruction for Opcode0xfx55 {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        let split_index = self.vx.checked_add(1).unwrap();
-        let (left, _) = register.v.split_at_mut(split_index);
-        let start = register.i as usize;
-        let end = register.i.checked_add(self.vx as u16).unwrap() as usize;
-        left.swap_with_slice(&mut memory.all[start..=end]);
+        for index in 0..self.vx + 1 {
+            let value = register.v[index];
+            memory.all[register.i as usize + index as usize] = value;
+        }
+        register.i += self.vx as u16 + 1;
         register.pc = match register.pc.checked_add(2) {
             Some(value) => value,
             None => panic!("program counter exceeds limitation"),
