@@ -17,11 +17,14 @@ impl Instruction for Opcode0x0nnn {
     fn execute(
         &self,
         _memory: &mut Memory,
-        _register: &mut Register,
+        register: &mut Register,
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        // Do Nothing
+        register.pc = match register.pc.checked_add(2) {
+            Some(value) => value,
+            None => panic!("program counter exceeds limitation"),
+        }
     }
 }
 
