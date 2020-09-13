@@ -21,10 +21,7 @@ impl Instruction for Opcode0x0nnn {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        register.pc = match register.pc.checked_add(2) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        }
+        register.pc += 2;
     }
 }
 
@@ -43,6 +40,6 @@ mod test {
 
         let (_, receiver) = mpsc::channel();
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
-        assert_eq!(register.pc, 0);
+        assert_eq!(register.pc, 0x202);
     }
 }

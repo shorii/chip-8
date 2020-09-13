@@ -37,11 +37,11 @@ impl Register {
                 let mut dt = delay_timer.lock().unwrap();
                 let mut st = sound_timer.lock().unwrap();
                 if *dt > 0 {
-                    *dt = dt.checked_sub(1).unwrap();
+                    *dt -= 1;
                 }
                 if *st > 0 {
                     // TODO beeping here
-                    *st = st.checked_sub(1).unwrap();
+                    *st -= 1;
                 }
             }
         });

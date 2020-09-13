@@ -23,11 +23,8 @@ impl Instruction for Opcode0xfx1e {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        register.i = register.i.checked_add(register.v[self.vx] as u16).unwrap();
-        register.pc = match register.pc.checked_add(2) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        };
+        register.i += register.v[self.vx] as u16;
+        register.pc += 2;
     }
 }
 
@@ -53,6 +50,6 @@ mod test {
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
 
         assert_eq!(register.i, 0xc);
-        assert_eq!(register.pc, 2);
+        assert_eq!(register.pc, 0x202);
     }
 }

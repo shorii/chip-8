@@ -28,10 +28,7 @@ impl Instruction for Opcode0xfx65 {
             register.v[index] = value;
         }
         register.i += (self.vx + 1) as u16;
-        register.pc = match register.pc.checked_add(2) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        };
+        register.pc += 2;
     }
 }
 
@@ -68,6 +65,6 @@ mod test {
         assert_eq!(register.v[0x3], 0x4);
         assert_eq!(register.v[0x4], 0x5);
         assert_eq!(register.v[0x5], 0x6);
-        assert_eq!(register.pc, 2);
+        assert_eq!(register.pc, 0x202);
     }
 }

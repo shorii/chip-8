@@ -28,14 +28,8 @@ impl Instruction for Opcode0xfx29 {
         let font_base = FONT_BASE as u16;
         let font_length = FONT_LENGTH as u16;
 
-        register.i = font_base
-            .checked_add(digit.checked_mul(font_length).unwrap())
-            .unwrap();
-
-        register.pc = match register.pc.checked_add(2) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        };
+        register.i = font_base + digit * font_length;
+        register.pc += 2;
     }
 }
 
@@ -61,6 +55,6 @@ mod test {
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
 
         assert_eq!(register.i, 0x46);
-        assert_eq!(register.pc, 2);
+        assert_eq!(register.pc, 0x202);
     }
 }

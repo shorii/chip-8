@@ -24,14 +24,14 @@ impl Instruction for Opcode0xexa1 {
         _graphic: &mut Graphic,
         keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        let increment = match keyboard_bus.try_recv() {
-            Ok(value) if value == register.v[self.vx] => 2,
-            _ => 4,
+        match keyboard_bus.try_recv() {
+            Ok(value) if value == register.v[self.vx] => {
+                register.pc += 2;
+            }
+            _ => {
+                register.pc += 4;
+            }
         };
-        register.pc = match register.pc.checked_add(increment) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        }
     }
 }
 
@@ -47,7 +47,6 @@ mod test {
 
         let mut register = Register::new();
         register.v[0xa] = 0x4;
-        register.pc = 0;
 
         let (sender, _) = mpsc::channel();
         let mut graphic = Graphic::new(sender);
@@ -55,7 +54,7 @@ mod test {
         let (sender, receiver) = mpsc::channel();
         sender.send(0x4).unwrap();
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
-        assert_eq!(register.pc, 2);
+        assert_eq!(register.pc, 0x202);
     }
 
     #[test]
@@ -66,7 +65,6 @@ mod test {
 
         let mut register = Register::new();
         register.v[0xb] = 0x5;
-        register.pc = 0;
 
         let (sender, _) = mpsc::channel();
         let mut graphic = Graphic::new(sender);
@@ -74,6 +72,6 @@ mod test {
         let (sender, receiver) = mpsc::channel();
         sender.send(0x4).unwrap();
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
-        assert_eq!(register.pc, 4);
+        assert_eq!(register.pc, 0x204);
     }
 }

@@ -32,9 +32,9 @@ mod test {
     fn test_execute() {
         let opcode = Opcode0x00ee::new();
         let mut memory = Memory::new();
-        memory.stack[0] = 1;
-        memory.stack[1] = 2;
-        memory.stack[2] = 3;
+        memory.stack.push(1);
+        memory.stack.push(2);
+        memory.stack.push(3);
         let mut register = Register::new();
 
         let (sender, _) = mpsc::channel();

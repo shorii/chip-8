@@ -23,10 +23,7 @@ impl Instruction for Opcode0xbnnn {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        let address = match self.address.checked_add(register.v[0] as u16) {
-            Some(value) => value,
-            None => panic!("invalid address access"),
-        };
+        let address = self.address + register.v[0] as u16;
         register.pc = address;
     }
 }

@@ -24,7 +24,7 @@ impl Instruction for Opcode0x2nnn {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        memory.stack.push(register.pc.checked_add(2).unwrap());
+        memory.stack.push(register.pc + 2);
         register.pc = self.address;
     }
 }
@@ -45,6 +45,6 @@ mod test {
         let (_, receiver) = mpsc::channel();
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
         assert_eq!(register.pc, 0x123);
-        assert_eq!(memory.stack[0], 1);
+        assert_eq!(memory.stack[0], 3);
     }
 }

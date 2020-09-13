@@ -26,10 +26,7 @@ impl Instruction for Opcode0x8xy0 {
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         register.v[self.vx] = register.v[self.vy];
-        register.pc = match register.pc.checked_add(2) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        }
+        register.pc += 2;
     }
 }
 
@@ -49,7 +46,7 @@ mod test {
         let mut graphic = Graphic::new(sender);
         let (_, receiver) = mpsc::channel();
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
-        assert_eq!(register.pc, 2);
+        assert_eq!(register.pc, 0x202);
         assert_eq!(register.v[1], 0x2);
     }
 }

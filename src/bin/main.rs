@@ -1,9 +1,9 @@
-use log::LevelFilter;
-use log4rs::append::file::FileAppender;
-use log4rs::encode::pattern::PatternEncoder;
-use log4rs::config::{Appender, Config, Root};
 use chip_8::emulator::{Cpu, Graphic, Memory, Register};
 use console::{Console, Keyboard};
+use log::LevelFilter;
+use log4rs::append::file::FileAppender;
+use log4rs::config::{Appender, Config, Root};
+use log4rs::encode::pattern::PatternEncoder;
 use std::collections::HashMap;
 use std::env;
 use std::sync::atomic::AtomicBool;
@@ -56,13 +56,13 @@ impl Keyboard for Keypad {
 fn setup_logger() {
     let logfile = FileAppender::builder()
         .encoder(Box::new(PatternEncoder::new("{l} - {m}¥n")))
-        .build("log/output.log").unwrap();
+        .build("log/output.log")
+        .unwrap();
 
     let config = Config::builder()
         .appender(Appender::builder().build("logfile", Box::new(logfile)))
-        .build(Root::builder()
-                .appender("logfile")
-                .build(LevelFilter::Info)).unwrap();
+        .build(Root::builder().appender("logfile").build(LevelFilter::Info))
+        .unwrap();
     log4rs::init_config(config).unwrap();
 }
 
@@ -89,11 +89,8 @@ fn main() {
     memory.load(rom_location);
     let register = Register::new();
     let mut emulator = Cpu::new(memory, register, graphic, key_event_receiver);
-    let mut console = Console::new(
-        graphic_receiver,
-        Box::new(keypad),
-        Arc::clone(&terminated)
-    ).unwrap();
+    let mut console =
+        Console::new(graphic_receiver, Box::new(keypad), Arc::clone(&terminated)).unwrap();
     console.run();
     emulator.execute(Arc::clone(&terminated));
     console.join();

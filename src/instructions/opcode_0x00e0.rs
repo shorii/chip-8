@@ -20,10 +20,7 @@ impl Instruction for Opcode0x00e0 {
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         graphic.clear();
-        register.pc = match register.pc.checked_add(2) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        }
+        register.pc += 2;
     }
 }
 

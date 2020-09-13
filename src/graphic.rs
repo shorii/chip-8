@@ -27,11 +27,7 @@ impl Graphic {
                 let mut coord_y = y + i;
                 coord_x %= 64;
                 coord_y %= 32;
-                let index = coord_y
-                    .checked_mul(64)
-                    .unwrap()
-                    .checked_add(coord_x)
-                    .unwrap();
+                let index = coord_y * 64 + coord_x;
                 if pixel != 0 {
                     let screen_pixel = self.gfx[index];
                     if screen_pixel == 1 {

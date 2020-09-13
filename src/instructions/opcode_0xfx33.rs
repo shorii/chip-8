@@ -24,17 +24,10 @@ impl Instruction for Opcode0xfx33 {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        memory.all[register.i as usize] = register.v[self.vx].checked_div(100).unwrap();
-        memory.all[register.i as usize + 1] = register.v[self.vx]
-            .checked_rem(100)
-            .unwrap()
-            .checked_div(10)
-            .unwrap();
-        memory.all[register.i as usize + 2] = register.v[self.vx].checked_rem(10).unwrap();
-        register.pc = match register.pc.checked_add(2) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        };
+        memory.all[register.i as usize] = register.v[self.vx] / 100;
+        memory.all[register.i as usize + 1] = (register.v[self.vx] % 100) / 10;
+        memory.all[register.i as usize + 2] = register.v[self.vx] % 10;
+        register.pc += 2;
     }
 }
 
@@ -62,6 +55,6 @@ mod test {
         assert_eq!(memory.all[0xa], 0x1);
         assert_eq!(memory.all[0xb], 0x2);
         assert_eq!(memory.all[0xc], 0x3);
-        assert_eq!(register.pc, 2);
+        assert_eq!(register.pc, 0x202);
     }
 }

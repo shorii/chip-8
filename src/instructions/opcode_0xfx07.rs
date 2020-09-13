@@ -25,10 +25,7 @@ impl Instruction for Opcode0xfx07 {
     ) {
         let dt = register.delay_timer.lock().unwrap();
         register.v[self.vx] = *dt;
-        register.pc = match register.pc.checked_add(2) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        }
+        register.pc += 2;
     }
 }
 
@@ -55,6 +52,6 @@ mod test {
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
 
         assert_eq!(*register.delay_timer.lock().unwrap(), 7);
-        assert_eq!(register.pc, 2);
+        assert_eq!(register.pc, 0x202);
     }
 }

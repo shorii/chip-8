@@ -25,18 +25,13 @@ impl Instruction for Opcode0xfx15 {
     ) {
         let mut dt = register.delay_timer.lock().unwrap();
         *dt = register.v[self.vx];
-        register.pc = match register.pc.checked_add(2) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        }
+        register.pc += 2;
     }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::sync::Arc;
-    use std::sync::Mutex;
 
     #[test]
     fn test_execute() {
@@ -45,7 +40,7 @@ mod test {
         let mut memory = Memory::new();
 
         let mut register = Register::new();
-        register.delay_timer = Arc::new(Mutex::new(0xa));
+        register.v[0x5] = 0xa;
 
         let (sender, _) = mpsc::channel();
         let mut graphic = Graphic::new(sender);
@@ -54,7 +49,7 @@ mod test {
 
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
 
-        assert_eq!(register.v[0x5], 0xa);
-        assert_eq!(register.pc, 2);
+        assert_eq!(*register.delay_timer.lock().unwrap(), 0xa);
+        assert_eq!(register.pc, 0x202);
     }
 }

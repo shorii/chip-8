@@ -28,10 +28,7 @@ impl Instruction for Opcode0xfx55 {
             memory.all[register.i as usize + index as usize] = value;
         }
         register.i += self.vx as u16 + 1;
-        register.pc = match register.pc.checked_add(2) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        };
+        register.pc += 2;
     }
 }
 
@@ -69,6 +66,6 @@ mod test {
         assert_eq!(memory.all[0xe], 0x5);
         assert_eq!(memory.all[0xf], 0x6);
         assert_eq!(memory.all[0x10], 0x0);
-        assert_eq!(register.pc, 2);
+        assert_eq!(register.pc, 0x202);
     }
 }

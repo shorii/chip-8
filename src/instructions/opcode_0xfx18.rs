@@ -26,10 +26,7 @@ impl Instruction for Opcode0xfx18 {
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
         register.sound_timer = Arc::new(Mutex::new(register.v[self.vx]));
-        register.pc = match register.pc.checked_add(2) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
-        }
+        register.pc += 2;
     }
 }
 
@@ -54,6 +51,6 @@ mod test {
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
 
         assert_eq!(*register.sound_timer.lock().unwrap(), 0xb);
-        assert_eq!(register.pc, 2);
+        assert_eq!(register.pc, 0x202);
     }
 }

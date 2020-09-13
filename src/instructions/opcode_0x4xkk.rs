@@ -26,14 +26,10 @@ impl Instruction for Opcode0x4xkk {
         _graphic: &mut Graphic,
         _keyboard_bus: &mpsc::Receiver<u8>,
     ) {
-        let mut increment = 0;
         if register.v[self.vx] != self.byte {
-            increment += 2;
-        }
-        increment += 2;
-        register.pc = match register.pc.checked_add(increment) {
-            Some(value) => value,
-            None => panic!("program counter exceeds limitation"),
+            register.pc += 4;
+        } else {
+            register.pc += 2;
         }
     }
 }
@@ -53,7 +49,7 @@ mod test {
         let mut graphic = Graphic::new(sender);
         let (_, receiver) = mpsc::channel();
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
-        assert_eq!(register.pc, 2);
+        assert_eq!(register.pc, 0x202);
     }
 
     #[test]
@@ -67,6 +63,6 @@ mod test {
         let mut graphic = Graphic::new(sender);
         let (_, receiver) = mpsc::channel();
         opcode.execute(&mut memory, &mut register, &mut graphic, &receiver);
-        assert_eq!(register.pc, 4);
+        assert_eq!(register.pc, 0x204);
     }
 }
